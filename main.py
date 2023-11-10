@@ -136,23 +136,23 @@ camera = cv.VideoCapture(gstreamer_pipeline(flip_method=0), cv.CAP_GSTREAMER)
 
 while 1:
     ref, frame = camera.read()
-    vis_frame = np.zeros_like(frame)
-    origin_viz_frame = np.zeros_like(frame)
-    canny = np.zeros_like(frame)
-    segment = np.zeros_like(frame)
-    try:
+
+    if ref:
+        vis_frame = np.zeros_like(frame)
+        origin_viz_frame = np.zeros_like(frame)
+
         canny = do_canny(frame)
         segment = do_segment(canny)
+
         lines = cv.HoughLinesP(segment, rho=1, theta=np.pi/180, threshold=100, minLineLength=100, maxLineGap=10)
 
         averaged_lines = calculate_lines(vis_frame, lines)
+        
         origin_viz_frame = visualize_lines(frame,lines)
-        vis_frame = visualize_lines(frame,averaged_lines)
-    except:
-        pass
+        cv.imshow('org',origin_viz_frame)
 
-    cv.imshow('org',origin_viz_frame)
-    cv.imshow('vis',vis_frame)
+        vis_frame = visualize_lines(frame,averaged_lines)
+        cv.imshow('vis',vis_frame)
 
     if cv.waitKey(1) == 27:
         break
