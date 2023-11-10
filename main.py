@@ -1,3 +1,13 @@
+'''
+Date: 20231110
+Author: Jian-Lun Li
+File: main.py
+
+description:
+The example code for course demo.
+
+'''
+
 from jetbot import Robot
 robot = Robot()
 
@@ -31,7 +41,6 @@ def gstreamer_pipeline(
         )
     )
 
-
 def do_canny(frame):
 
 ######################################TO DO######################################
@@ -46,9 +55,6 @@ def do_canny(frame):
     edges = cv.Canny(blur,50,150)
 
     return edges
-
-
-######################################TO DO######################################
 
 def do_segment(frame):
     # Since an image is a multi-directional array containing the relative intensities of each pixel in the image, we can use frame.shape to return a tuple: [number of rows, number of columns, number of channels] of the dimensions of the frame
@@ -127,9 +133,11 @@ def visualize_lines(frame, lines):
 
 
 camera = cv.VideoCapture(gstreamer_pipeline(flip_method=0), cv.CAP_GSTREAMER)
+
 while 1:
     ref, frame = camera.read()
     vis_frame = np.zeros_like(frame)
+    origin_viz_frame = np.zeros_like(frame)
     canny = np.zeros_like(frame)
     segment = np.zeros_like(frame)
     try:
@@ -138,17 +146,15 @@ while 1:
         lines = cv.HoughLinesP(segment, rho=1, theta=np.pi/180, threshold=100, minLineLength=100, maxLineGap=10)
 
         averaged_lines = calculate_lines(vis_frame, lines)
+        origin_viz_frame = visualize_lines(frame,lines)
         vis_frame = visualize_lines(frame,averaged_lines)
     except:
         pass
 
-    #cv.imshow('frame',frame)
-    #cv.imshow('vis_frame',vis_frame)
-    
+    cv.imshow('org',origin_viz_frame)
     cv.imshow('vis',vis_frame)
-    cv.imshow('canny',canny)
-    cv.imshow('seg',segment)
 
     if cv.waitKey(1) == 27:
         break
+
 cv.destroyAllWindows()
